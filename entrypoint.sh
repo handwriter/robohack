@@ -1,8 +1,22 @@
 #!/usr/bin/env bash
 set -eu
 
-if [ "$#" -ne 1 ] || [ "$1" != ping ]; then
+if [ "$#" -ne 1 ]; then
     exit 64
 fi
 
-printf '%s\n' '{"protocol_version":"1.0","supported_tasks":[],"self_trained_rl":false,"preferred_speed_mps":null}'
+case "$1" in
+    ping)
+        printf '%s\n' '{"protocol_version":"1.0","supported_tasks":["T2"],"self_trained_rl":false,"preferred_speed_mps":null}'
+        ;;
+    T2)
+        set +u
+        source /opt/ros/humble/setup.bash
+        source /opt/ws/install/setup.bash
+        set -u
+        exec ros2 run go1_safety safety_node
+        ;;
+    *)
+        exit 64
+        ;;
+esac
