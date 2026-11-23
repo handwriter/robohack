@@ -7,8 +7,15 @@ ENV ROS_DISTRO=humble \
     RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
 
 USER root
-RUN apt-get update && apt-get install -y --no-install-recommends \
-        python3-pip ros-humble-rosidl-generator-dds-idl \
+RUN sed -i -e 's|http://archive.ubuntu.com|https://archive.ubuntu.com|g' \
+           -e 's|http://security.ubuntu.com|https://security.ubuntu.com|g' \
+           /etc/apt/sources.list /etc/apt/sources.list.d/* \
+    && printf 'Acquire::Retries "3";\nAcquire::http::Timeout "60";\nAcquire::https::Timeout "60";\n' \
+       > /etc/apt/apt.conf.d/80robohack \
+    && apt-get update && apt-get install -y --no-install-recommends \
+        python3-pip python3-scipy \
+        ros-humble-rosidl-generator-dds-idl \
+        ros-humble-tf2-ros-py \
     && rm -rf /var/lib/apt/lists/*
 RUN pip3 install --no-cache-dir "numpy<2" "mujoco==3.3.7"
 
@@ -19,9 +26,10 @@ RUN git clone https://github.com/unitreerobotics/unitree_ros2.git /tmp/unitree_r
     && rm -rf /tmp/unitree_ros2
 
 COPY go1_safety /opt/ws/src/go1_safety
+COPY src/go1_odometry /opt/ws/src/go1_odometry
 RUN . /opt/ros/humble/setup.sh \
     && cd /opt/ws \
-    && colcon build --packages-select unitree_go go1_safety \
+    && colcon build --packages-select unitree_go go1_safety go1_odometry \
     && rm -rf build log \
     && chmod -R a+rX /opt/ws
 

@@ -1,4 +1,4 @@
-# Решение T1
+# Решение T2 + T4
 
 Сборка:
 
@@ -6,7 +6,7 @@
 docker buildx build \
   --platform linux/amd64 \
   --load \
-  -t robohack:t1 .
+  -t robohack:t2-t4 .
 ```
 
 Проверка:
@@ -16,8 +16,10 @@ docker run --rm \
   --platform linux/amd64 \
   --network none \
   --entrypoint /entrypoint.sh \
-  robohack:t1 ping
+  robohack:t2-t4 ping
 ```
+
+Ожидаемый ответ `ping` содержит `supported_tasks` со значениями `T2` и `T4`.
 
 ## T2. Safety Block
 
@@ -43,3 +45,15 @@ pip install "mujoco==3.3.7" numpy pytest
 cd go1_safety
 PYTHONPATH=. python3 -m pytest test
 ```
+
+## T4. Оценка движения робота
+
+Пакет `go1_odometry` оценивает положение и ориентацию робота по IMU, состояниям суставов и лидару. Он публикует `/odom` и TF `odom -> trunk`, не использует `/odom/ground_truth` и не публикует команды движения.
+
+Локальный запуск T4:
+
+```bash
+python3 run_local.py --task T4 --participant-image robohack:t2-t4 --gui --logs
+```
+
+Запуск узла выполняется командой `/entrypoint.sh T4`. Пакетные тесты находятся в `tests/`, локальные инструменты оценки — в `tools/`.
