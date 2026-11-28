@@ -26,11 +26,12 @@ RUN git clone https://github.com/unitreerobotics/unitree_ros2.git /tmp/unitree_r
     && rm -rf /tmp/unitree_ros2
 
 COPY go1_safety /opt/ws/src/go1_safety
+COPY src/go1_locomotion /opt/ws/src/go1_locomotion
 COPY src/go1_odometry /opt/ws/src/go1_odometry
 COPY src/go1_navigation /opt/ws/src/go1_navigation
 RUN . /opt/ros/humble/setup.sh \
     && cd /opt/ws \
-    && colcon build --packages-select unitree_go go1_safety go1_odometry go1_navigation \
+    && colcon build --packages-select unitree_go go1_safety go1_locomotion go1_odometry go1_navigation \
     && rm -rf build log \
     && chmod -R a+rX /opt/ws
 
