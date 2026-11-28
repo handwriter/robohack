@@ -1,4 +1,4 @@
-# Решение T2 + T4
+# Решение T2 + T4 + T5
 
 Сборка:
 
@@ -6,7 +6,7 @@
 docker buildx build \
   --platform linux/amd64 \
   --load \
-  -t robohack:t2-t4 .
+  -t robohack:t2-t5 .
 ```
 
 Проверка:
@@ -16,10 +16,10 @@ docker run --rm \
   --platform linux/amd64 \
   --network none \
   --entrypoint /entrypoint.sh \
-  robohack:t2-t4 ping
+  robohack:t2-t5 ping
 ```
 
-Ожидаемый ответ `ping` содержит `supported_tasks` со значениями `T2` и `T4`.
+Ожидаемый ответ `ping` содержит `supported_tasks` со значениями `T2`, `T4` и `T5`.
 
 ## T2. Safety Block
 
@@ -35,7 +35,7 @@ ROS 2 узел `go1_safety` (папка `go1_safety/`) принимает ком
 Запуск с симулятором:
 
 ```bash
-python3 run_local.py --task T2 --participant-image robohack:t1 --gui
+python3 run_local.py --task T2 --participant-image robohack:t2-t5 --gui
 ```
 
 Тесты:
@@ -53,7 +53,19 @@ PYTHONPATH=. python3 -m pytest test
 Локальный запуск T4:
 
 ```bash
-python3 run_local.py --task T4 --participant-image robohack:t2-t4 --gui --logs
+python3 run_local.py --task T4 --participant-image robohack:t2-t5 --gui --logs
 ```
 
 Запуск узла выполняется командой `/entrypoint.sh T4`. Пакетные тесты находятся в `tests/`, локальные инструменты оценки — в `tools/`.
+
+## T5. Автономная навигация и ArUco
+
+Пакет `go1_navigation` запускает Nav2, публикует `map -> odom`, принимает action `/navigate_to_pose`, формирует `/cmd_vel` и распознаёт ArUco-метки из пяти RGB-камер. Результаты публикуются в `/aruco/detections` как JSON с текущими ID.
+
+Локальный запуск T5 для трассы шириной 1 м:
+
+```bash
+python3 run_local.py --task T5 --course-width 1.0 --participant-image robohack:t2-t5 --gui --logs
+```
+
+Запуск узла выполняется командой `/entrypoint.sh T5`. Конфигурация Nav2 и дерево поведения находятся в `src/go1_navigation/`.

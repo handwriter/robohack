@@ -13,9 +13,9 @@ RUN sed -i -e 's|http://archive.ubuntu.com|https://archive.ubuntu.com|g' \
     && printf 'Acquire::Retries "3";\nAcquire::http::Timeout "60";\nAcquire::https::Timeout "60";\n' \
        > /etc/apt/apt.conf.d/80robohack \
     && apt-get update && apt-get install -y --no-install-recommends \
-        python3-pip python3-scipy \
+        python3-pip python3-scipy python3-opencv python3-yaml \
         ros-humble-rosidl-generator-dds-idl \
-        ros-humble-tf2-ros-py \
+        ros-humble-tf2-ros-py ros-humble-navigation2 \
     && rm -rf /var/lib/apt/lists/*
 RUN pip3 install --no-cache-dir "numpy<2" "mujoco==3.3.7"
 
@@ -27,9 +27,10 @@ RUN git clone https://github.com/unitreerobotics/unitree_ros2.git /tmp/unitree_r
 
 COPY go1_safety /opt/ws/src/go1_safety
 COPY src/go1_odometry /opt/ws/src/go1_odometry
+COPY src/go1_navigation /opt/ws/src/go1_navigation
 RUN . /opt/ros/humble/setup.sh \
     && cd /opt/ws \
-    && colcon build --packages-select unitree_go go1_safety go1_odometry \
+    && colcon build --packages-select unitree_go go1_safety go1_odometry go1_navigation \
     && rm -rf build log \
     && chmod -R a+rX /opt/ws
 

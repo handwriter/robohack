@@ -7,7 +7,7 @@ fi
 
 case "$1" in
     ping)
-        printf '%s\n' '{"protocol_version":"1.0","supported_tasks":["T2","T4"],"self_trained_rl":false,"preferred_speed_mps":null}'
+        printf '%s\n' '{"protocol_version":"1.0","supported_tasks":["T2","T4","T5"],"self_trained_rl":false,"preferred_speed_mps":null}'
         ;;
     T2)
         set +u
@@ -22,6 +22,13 @@ case "$1" in
         source /opt/ws/install/setup.bash
         set -u
         exec ros2 run go1_odometry odometry_node --ros-args -p use_sim_time:=true
+        ;;
+    T5)
+        set +u
+        source /opt/ros/humble/setup.bash
+        source /opt/ws/install/setup.bash
+        set -u
+        exec ros2 launch go1_navigation t5.launch.py
         ;;
     *)
         exit 64

@@ -19,7 +19,7 @@ def test_ping_contract():
     assert p.stdout.strip() == p.stdout.strip('\n').strip()        # нет посторонних строк
     data = json.loads(p.stdout)                                    # ровно один JSON-объект
     assert data['protocol_version'] == '1.0'
-    assert isinstance(data['supported_tasks'], list) and data['supported_tasks'] == ['T2', 'T4']
+    assert isinstance(data['supported_tasks'], list) and data['supported_tasks'] == ['T2', 'T4', 'T5']
     assert all(t in ('T2', 'T3', 'T4', 'T5') for t in data['supported_tasks'])
     assert isinstance(data['self_trained_rl'], bool)
     assert data['preferred_speed_mps'] is None                     # T3 не реализовано
@@ -27,7 +27,7 @@ def test_ping_contract():
 
 
 def test_unsupported_tasks_do_not_pollute_stdout():
-    for task in ('T3', 'T5'):
+    for task in ('T3',):
         p, _ = run(task)
         assert p.returncode != 0 and p.stdout == ''
     p, _ = run('bogus')

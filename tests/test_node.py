@@ -66,6 +66,9 @@ class StubNode:
     def create_subscription(self, msg_type, topic, cb, qos):
         self.subs[topic] = Ns(msg_type=msg_type, cb=cb, qos=qos)
 
+    def create_timer(self, period, cb):
+        self.timers = getattr(self, 'timers', []) + [Ns(period=period, cb=cb)]
+
     def get_logger(self):
         node = self
         return Ns(info=lambda m, **k: node.logs.append(('info', m)),
@@ -109,7 +112,10 @@ def install_stubs():
     mod('geometry_msgs')
     mod('geometry_msgs.msg', TransformStamped=make_msg_class(
         lambda: dict(header=header(), child_frame_id='',
-                     transform=Ns(translation=vec3(), rotation=quat()))))
+                     transform=Ns(translation=vec3(), rotation=quat()))),
+        PoseWithCovarianceStamped=make_msg_class(
+            lambda: dict(header=header(), pose=Ns(pose=Ns(position=vec3(), orientation=quat()),
+                                                  covariance=[0.0] * 36))))
     mod('nav_msgs')
     mod('nav_msgs.msg', Odometry=make_msg_class(
         lambda: dict(header=header(), child_frame_id='',
@@ -122,9 +128,12 @@ def install_stubs():
                                         angular_velocity=vec3(), linear_acceleration=vec3())),
         JointState=make_msg_class(lambda: dict(header=header(), name=[], position=[], velocity=[])),
         LaserScan=make_msg_class(lambda: dict(header=header(), angle_min=0.0, angle_increment=0.0,
-                                              ranges=[])))
+                                              ranges=[])),
+        Image=make_msg_class(lambda: dict(header=header(), height=0, width=0, encoding='',
+                                          is_bigendian=0, step=0, data=b'')))
     mod('std_msgs')
-    mod('std_msgs.msg', Bool=make_msg_class(lambda: dict(data=False)))
+    mod('std_msgs.msg', Bool=make_msg_class(lambda: dict(data=False)),
+        String=make_msg_class(lambda: dict(data='')))
     mod('tf2_ros', TransformBroadcaster=StubTfBroadcaster)
 
 
